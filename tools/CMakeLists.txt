@@ -7,7 +7,10 @@ set(BUILDSYS_CPP_STANDARD 14)
 
 include(buildsys/cmake/buildsys.cmake)
 
-enable_OpenMP()
+IF(CMAKE_BUILD_TYPE MATCHES Release)
+  message("RELEASE mode, enable OpenMP")
+  enable_OpenMP()
+ENDIF(CMAKE_BUILD_TYPE MATCHES Release)
 
 find_package(Boost 1.46 REQUIRED
   COMPONENTS thread program_options filesystem system date_time

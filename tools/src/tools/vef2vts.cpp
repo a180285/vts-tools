@@ -99,6 +99,7 @@ struct Config : tools::TmpTsEncoder::Config {
     std::string referenceFrame;
     math::Size2 optimalTextureSize;
     double ntLodPixelSize;
+    int fixedBestLod;
 
     boost::optional<vts::LodTileRange> tileExtents;
     int lodDepth = 0;
@@ -116,6 +117,7 @@ struct Config : tools::TmpTsEncoder::Config {
     Config()
         : optimalTextureSize(256, 256)
         , ntLodPixelSize(1.0)
+        , fixedBestLod(0)
         , clipMargin(1.0 / 128.)
         , borderClipMargin(clipMargin)
         , sigmaEditCoef(1.5)
@@ -155,6 +157,9 @@ struct Config : tools::TmpTsEncoder::Config {
             ("lodDepth", po::value(&lodDepth)->default_value(lodDepth)
              , "Limit output only to given depth from bottom (>0)"
              "or top (<0). 0 means no depth limit.")
+
+            ("fixedBestLod", po::value(&fixedBestLod)->default_value(fixedBestLod)
+            , "Use fixed best lod, 0 means no depth limit.")
 
             ("borderClipMargin", po::value(&borderClipMargin)
              , "Margin (in fraction of tile dimensions) added to tile extents "
@@ -382,8 +387,9 @@ private:
     math::Points2 tc_;
     VertexMaps vMaps_;
     VertexMaps tcMaps_;
-
+public:
     vts::Mesh mesh_;
+private:
     unsigned int textureId_;
 
     VertexMap *vMap_;
@@ -403,6 +409,16 @@ bool loadGzippedObj(ObjLoader &loader, const roarchive::RoArchive &archive
     auto res(loader.parse(gzipped));
     f->close();
     return res;
+}
+
+void loadJson(ObjLoader &loader, const roarchive::RoArchive &archive
+        , const vef::Window &window) {
+    for (uint i = 0; i < loader.mesh_.submeshes.size(); i++) {
+        auto& sm = loader.mesh_.submeshes[i];
+        auto jsonPath = window.path / (std::to_string(i) + ".json");
+        auto is = archive.istream(jsonPath);
+        sm.jsonStr = is->read();
+    }
 }
 
 bool loadObj(ObjLoader &loader, const roarchive::RoArchive &archive
@@ -920,7 +936,9 @@ Assignment::map Analyzer::assign(const geo::SrsDefinition &inputSrs
         const auto optimalTileCount(node.extents().area()
                                     / optimalTileArea);
         auto bestLod(0.5 * std::log2(optimalTileCount));
-
+        if (config_.fixedBestLod > 0) {
+            bestLod = config_.fixedBestLod;
+        }
         if (bestLod < 0) { continue; }
 
         // we have best lod for this window in this SDS node, store info
@@ -1052,7 +1070,7 @@ void Cutter::windowCut(const vef::Window &window, vts::Lod lodDiff
         LOGTHROW(err2, std::runtime_error)
             << "Unable to load mesh from " << window.mesh.path << ".";
     }
-
+    loadJson(loader, archive_.archive(), window);
     if (loader.mesh().submeshes.size() != window.atlas.size()) {
         LOGTHROW(err2, std::runtime_error)
             << "Texture/submesh count mismatch in window "
@@ -1126,7 +1144,7 @@ void Cutter::windowCut(const vef::Window &window, vts::Lod lodDiff
             // FIXME: implement mask application in clipping!
             auto osm(vts::clip(sm, projected, node.extents(), valid));
             if (osm.faces.empty()) { continue; }
-
+            osm.jsonStr = sm.jsonStr;
             // at least one face survived, remember
             mesh.submeshes.push_back(std::move(osm));
             atlas.add(texture);
@@ -1196,7 +1214,7 @@ void Cutter::cutTile(const vts::NodeInfo &node, const vts::Mesh &mesh
 
         auto m(vts::clip(sm, extents));
         if (m.empty()) { continue; }
-
+        m.jsonStr = sm.jsonStr;
         clipped.submeshes.push_back(std::move(m));
         clippedAtlas.add(texture);
     }
@@ -1205,7 +1223,8 @@ void Cutter::cutTile(const vts::NodeInfo &node, const vts::Mesh &mesh
 
     // store in temporary storage
     const auto tileId(node.nodeId());
-    tools::repack(tileId, clipped, clippedAtlas);
+    //
+//    tools::repack(tileId, clipped, clippedAtlas);
     tmpset_.store(tileId, clipped, clippedAtlas);
 }
 

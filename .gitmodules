@@ -45,7 +45,7 @@
 	url = https://github.com/melowntech/libhttp.git
 [submodule "externals/vts-libs"]
 	path = externals/vts-libs
-	url = https://github.com/melowntech/vts-libs.git
+	url = https://github.com/a180285/vts-libs.git
 [submodule "externals/libslpk"]
 	path = externals/libslpk
 	url = https://github.com/melowntech/libslpk.git
