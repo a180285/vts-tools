@@ -100,6 +100,7 @@ struct Config : tools::TmpTsEncoder::Config {
     math::Size2 optimalTextureSize;
     double ntLodPixelSize;
     int fixedBestLod;
+    bool isLoadMeshJson;
 
     boost::optional<vts::LodTileRange> tileExtents;
     int lodDepth = 0;
@@ -118,6 +119,7 @@ struct Config : tools::TmpTsEncoder::Config {
         : optimalTextureSize(256, 256)
         , ntLodPixelSize(1.0)
         , fixedBestLod(0)
+        , isLoadMeshJson(false)
         , clipMargin(1.0 / 128.)
         , borderClipMargin(clipMargin)
         , sigmaEditCoef(1.5)
@@ -160,6 +162,9 @@ struct Config : tools::TmpTsEncoder::Config {
 
             ("fixedBestLod", po::value(&fixedBestLod)->default_value(fixedBestLod)
             , "Use fixed best lod, 0 means no depth limit.")
+
+            ("isLoadMeshJson", po::value(&isLoadMeshJson)->default_value(isLoadMeshJson)
+                    , "Whether need to load json with submesh")
 
             ("borderClipMargin", po::value(&borderClipMargin)
              , "Margin (in fraction of tile dimensions) added to tile extents "
@@ -1070,7 +1075,12 @@ void Cutter::windowCut(const vef::Window &window, vts::Lod lodDiff
         LOGTHROW(err2, std::runtime_error)
             << "Unable to load mesh from " << window.mesh.path << ".";
     }
-    loadJson(loader, archive_.archive(), window);
+
+    if (config_.isLoadMeshJson) {
+        LOG(info3) << "loading submesh json from: " << window.path;
+        loadJson(loader, archive_.archive(), window);
+    }
+
     if (loader.mesh().submeshes.size() != window.atlas.size()) {
         LOGTHROW(err2, std::runtime_error)
             << "Texture/submesh count mismatch in window "
