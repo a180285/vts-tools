@@ -86,13 +86,13 @@ sudo apt-get install \
 ### Clone and Download
 
 The source code can be downloaded from
-[GitHub repository](https://github.com/melown/vts-tools), but since there are
+[GitHub repository](https://github.com/a180285/vts-tools), but since there are
 external dependences, you have to use `--recursive` switch while cloning the
 repo.
 
 
 ```
-git clone --recursive https://github.com/Melown/vts-tools.git 
+git clone --recursive https://github.com/a180285/vts-tools.git 
 ```
 
 **NOTE:** If you did clone from GitHub previously without the `--recursive`
