@@ -316,6 +316,11 @@ public:
     ObjLoader(const vef::OptionalMatrix trafo)
         : textureId_(0), vMap_(), tcMap_(), trafo_(trafo)
     {
+        if (trafo_) {
+            LOGTHROW(err2, std::runtime_error) <<
+                ("Do not support trafo_ now.");
+            return;
+        }
         // make sure we have at least one valid material
         useMaterial(0);
     }
@@ -327,9 +332,9 @@ private:
     typedef std::vector<VertexMap> VertexMaps;
 
     virtual void addVertex(const Vector3d &v) {
-
-        vertices_.emplace_back(
-            optionalTransform(trafo_, math::Point3(v.x, v.y, v.z)));
+        vertices_.emplace_back(v.x, v.y, v.z);
+//        vertices_.emplace_back(
+//            optionalTransform(trafo_, math::Point3(v.x, v.y, v.z)));
     }
 
     virtual void addTexture(const Vector3d &t) {
@@ -362,6 +367,9 @@ private:
         sm.faces.emplace_back();
         addFace(f.v, sm.faces.back(), vertices_, sm.vertices, *vMap_);
 
+        sm.normalIndexes.emplace_back();
+        addFace(f.n, sm.normalIndexes.back(), normals_, sm.normals, *normalMap_);
+
         sm.facesTc.emplace_back();
         addFace(f.t, sm.facesTc.back(), tc_, sm.tc, *tcMap_);
     }
@@ -378,19 +386,26 @@ private:
         if (mesh_.submeshes.size() <= textureId_) {
             mesh_.submeshes.resize(textureId_ + 1);
             vMaps_.resize(textureId_ + 1);
+            normalMaps_.resize(textureId_ + 1);
             tcMaps_.resize(textureId_ + 1);
 
             vMap_ = &vMaps_[textureId_];
+            normalMap_ = &normalMaps_[textureId_];
             tcMap_ = &tcMaps_[textureId_];
         }
     }
 
-    virtual void addNormal(const Vector3d&) { /*ignored*/ }
+    virtual void addNormal(const Vector3d& vn) {
+        normals_.emplace_back(vn.x, vn.y, vn.z);
+    }
+
     virtual void materialLibrary(const std::string&) { /*ignored*/ }
 
     math::Points3 vertices_;
+    math::Points3 normals_;
     math::Points2 tc_;
     VertexMaps vMaps_;
+    VertexMaps normalMaps_;
     VertexMaps tcMaps_;
 public:
     vts::Mesh mesh_;
@@ -398,6 +413,7 @@ private:
     unsigned int textureId_;
 
     VertexMap *vMap_;
+    VertexMap *normalMap_;
     VertexMap *tcMap_;
     vef::OptionalMatrix trafo_;
 };
