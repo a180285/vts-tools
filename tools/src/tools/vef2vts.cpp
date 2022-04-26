@@ -439,6 +439,11 @@ void loadJson(ObjLoader &loader, const roarchive::RoArchive &archive
         auto jsonPath = window.path / (std::to_string(i) + ".json");
         auto is = archive.istream(jsonPath);
         sm.jsonStr = is->read();
+        if (sm.jsonStr.size() < 2) {
+            LOGTHROW(err2, std::runtime_error)
+                    << "There is empty json file in window "
+                    << window.path << ".";
+        }
     }
 }
 
