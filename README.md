@@ -30,6 +30,13 @@ sudo apt-get install cmake g++
 
 #### VTS dependencies
 
+**Note**: ubuntu 20.04 use following command to add source
+```
+# You can Install Registry from Melown repository
+wget -O - http://cdn.melown.com/packages/keys/oss.packages%40melown.com.key | sudo apt-key add
+cd /etc/apt/sources.list.d/ && sudo wget http://cdn.melown.com/packages/conf/melown-focal.list
+```
+
 Before you can run [VTS-Tools](https://github.com/melown/vts-tools), you
 need at least [VTS-Registry](https://github.com/melown/vts-registry) downloaded
 and installed in your system. Please refer to related
