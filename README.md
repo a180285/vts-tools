@@ -52,19 +52,6 @@ make -j4
 sudo make install
 ```
 
-#### Adding UbuntuGIS repo
-
-**NOTE:** If you are using Ubuntu 20.04, you can ignore this ppa and try to build first.
-
-VTS-Tools needs newer version of [GDAL](http://gdal.org) library, than it is
-available in Ubuntu repos. Therefore you need to add [UbuntuGIS](https://wiki.ubuntu.com/UbuntuGIS)
-repository to your `apt` sources:
-
-```
-sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable
-sudo apt-get update
-```
-
 #### Installing packaged dependencies
 
 Now we can download and install rest of the dependencies, which are needed to
