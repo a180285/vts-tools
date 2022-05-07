@@ -90,7 +90,12 @@ repo.
 
 
 ```
-git clone --recursive https://github.com/Melown/vts-tools.git 
+git clone --recursive https://github.com/Melown/vts-tools.git
+```
+
+**NOTE:** Otherwise you should clone submodule by yourself, like this:
+```bash
+git submodule update --init --recursive
 ```
 
 **NOTE:** If you did clone from GitHub previously without the `--recursive`
