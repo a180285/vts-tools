@@ -104,6 +104,9 @@ For building VTS-Tools, you just have to use ``make``
 
 ```
 cd tools
+mkdir build
+cd build
+cmake ..
 make -j4 # to compile in 4 threads
 ```
 
