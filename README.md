@@ -110,6 +110,8 @@ cmake ..
 make -j4 # to compile in 4 threads
 ```
 
+### Installing
+
 Default target location (for later `make install`) is `/usr/local/` directory.
 You can set the `CMAKE_INSTALL_PREFIX` variable, to change it:
 
@@ -123,8 +125,6 @@ hour of compilation time.
 
 The binaries are then stored in `bin` directory. Development libraries are
 stored in `lib` directory.
-
-### Installing
 
 You should be able to call `make install`, which will install to either defaul
 location `/usr/local/` or to directory defined previously by the
