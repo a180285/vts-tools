@@ -27,7 +27,7 @@
 	url = https://github.com/melowntech/libservice.git
 [submodule "externals/libgeometry"]
 	path = externals/libgeometry
-	url = https://github.com/melowntech/libgeometry.git
+	url = https://github.com/a180285/libgeometry.git
 [submodule "externals/libvef"]
 	path = externals/libvef
 	url = https://github.com/melowntech/libvef.git
